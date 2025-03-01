@@ -1,17 +1,17 @@
 import "./App.css";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import Navbar from "./components/pages/Navbar";
 import Login from "./components/pages/Login";
 import Tasks from "./components/pages/Tasks";
 
 function App() {
     const navigate = useNavigate();
+    const location = useLocation(); // Get current location
     const [isAuth, setIsAuth] = useState(false);
 
     useEffect(() => {
-        const authStatus = Cookies.get("isAuth");
+        const authStatus = localStorage.getItem("authToken");  
         if (authStatus) {
             setIsAuth(true);
         } else {
@@ -22,10 +22,10 @@ function App() {
 
     return (
         <>
-            {isAuth && <Navbar />}
+            {location.pathname !== "/" && <Navbar />}
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/task" element={<Tasks /> }/>
+                <Route path="/task" element={<Tasks />} />
             </Routes>
         </>
     );

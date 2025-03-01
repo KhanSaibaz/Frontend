@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Button, TextField, Container, Typography } from '@mui/material';
-import { toast,ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
-
+import { useLoginMutation } from '../redux/slices/loginSlice'
+import { useDispatch } from "react-redux";
+import { setToken } from '../redux/slices/authSlice'
 
 
 
@@ -11,25 +13,35 @@ const Login = () => {
   let navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [login, { isLoading, isError, error, data }] = useLoginMutation();
+  const dispatch = useDispatch();
 
-  const handleSignIn = () => {
-    
-    if(!email){
-        console.log("click1");
-        
-        toast.info("Please Enter Email")
+
+  const handleSignIn = async () => {
+
+    if (!email) {
+      console.log("click1");
+
+      toast.info("Please Enter Email")
     }
-    else if(!password){
-        toast.info("Please Enter the password")
+    else if (!password) {
+      toast.info("Please Enter the password")
     }
-    else if(email==='user@gmail.com' && password==='1'){
+    else {
+      const creditanils = {
+        email: email,
+        password: password
+      }
+      const reposnse = await login(creditanils)
+      console.log(reposnse)
+      if (reposnse?.data?.message == 'Login successful') {
+        dispatch(setToken(reposnse?.data?.token))
+        toast.success(reposnse?.data?.message)
         navigate('/task')
-        Cookies.set("isAuth", "true", { expires: 1 }); // Expires in 1 day
-
-    }
-    else{
-      toast.error("Invalid Credintals")
-
+      }
+      else{
+        toast.error(reposnse?.error?.data?.message)
+      }
     }
 
   };

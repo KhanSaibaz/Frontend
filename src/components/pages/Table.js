@@ -14,7 +14,7 @@ import "./header.scss";
 import { IconButton } from '@mui/material';
 
 
-function TableData({ data }) {
+function TableData({ data,handleDeleteTask,handleUpdateTask }) {
     const [totalPages, setTotalPage] = useState(null)
     const [currentPage, setCurrentPage] = useState(1)
 
@@ -26,26 +26,29 @@ function TableData({ data }) {
     const handlePageChange = (event, newpage) => {
         setCurrentPage(newpage)
     }
-    const actionButton = () => {
-        console.log('eit')
+    const actionButton = (row) => {
         return (
             <div className='icon-style'>
-                <IconButton>
+                <IconButton onClick={()=>handleUpdateTask(row)} >
                     <EditIcon sx={{ color: '#1976D2' }} />
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={()=>handleDeleteTask(row?.id)} >
                     <DeleteIcon sx={{ color: 'red' }} />
                 </IconButton>
             </div>
         )
     }
 
-    const paginatedData = data.slice((currentPage - 1) * 5, currentPage * 5);
+    const paginatedData = data?.slice((currentPage - 1) * 5, currentPage * 5);
+
+    const formatDate=(date)=>{
+        return date.split("T")[0]
+    }
 
     return (
         <div className='display-data'>
             <TableContainer component={Paper}>
-                {data.length === 0 ? (
+                {data?.length === 0 ? (
                     <Typography variant="h6" align="center" sx={{ padding: 2 }}>
                         No tasks available
                     </Typography>
@@ -70,12 +73,12 @@ function TableData({ data }) {
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell align="center">{(currentPage - 1) * 5 + index + 1}</TableCell>
-                                    <TableCell align="center">{row.taskName}</TableCell>
+                                    <TableCell align="center">{row.taskname}</TableCell>
                                     <TableCell align="center">{row.fromTime}</TableCell>
                                     <TableCell align="center">{row.toTime}</TableCell>
-                                    <TableCell align="center">{row.fromDate}</TableCell>
-                                    <TableCell align="center">{row.toDate}</TableCell>
-                                    <TableCell align="center">{actionButton()}</TableCell>
+                                    <TableCell align="center">{formatDate(row.fromDate)}</TableCell>
+                                    <TableCell align="center">{formatDate(row.toDate)}</TableCell>
+                                    <TableCell align="center">{actionButton(row)}</TableCell>
 
                                 </TableRow>
                             ))}

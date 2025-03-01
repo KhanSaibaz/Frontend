@@ -1,14 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit'
-import BaseApi from '../baseQuery/BaseApi'
+import { configureStore } from '@reduxjs/toolkit';
+import BaseApi from '../baseQuery/BaseApi';
 import counterSlice from '../slices/countersilces';
+import authReducer from '../slices/authSlice';
 
 export const store = configureStore({
     reducer: {
-      [BaseApi.reducerPath]: BaseApi.reducer,   // these one is for api 
-      counter: counterSlice,  // thes one is without api
+      [BaseApi.reducerPath]: BaseApi.reducer,  // Reducer for API requests
+      counter: counterSlice, 
+      auth: authReducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(BaseApi.middleware),
-  });
-  
-  export default store;
+});
+
+export default store;

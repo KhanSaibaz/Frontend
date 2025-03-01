@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import Navbar from "./components/pages/Navbar";
+import Login from "./components/pages/Login";
+import Tasks from "./components/pages/Tasks";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const navigate = useNavigate();
+    const [isAuth, setIsAuth] = useState(false);
+
+    useEffect(() => {
+        const authStatus = Cookies.get("isAuth");
+        if (authStatus) {
+            setIsAuth(true);
+        } else {
+            setIsAuth(false);
+            navigate("/");
+        }
+    }, [navigate]);
+
+    return (
+        <>
+            {isAuth && <Navbar />}
+            <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/task" element={<Tasks /> }/>
+            </Routes>
+        </>
+    );
 }
 
 export default App;

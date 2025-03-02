@@ -13,8 +13,8 @@ const TaskApi = BaseApi.injectEndpoints({
             })
         }),
         updateTask: builder.mutation({
-            query: ({ id, data }) => ({
-                url: `/api/updateTasks/${id}`,
+            query: ({ data,taskId }) => ({
+                url: `/api/updateTasks/${taskId}`,
                 method: "PUT",
                 body: data
             })

@@ -42,7 +42,7 @@ function TableData({ data,handleDeleteTask,handleUpdateTask }) {
     const paginatedData = data?.slice((currentPage - 1) * 5, currentPage * 5);
 
     const formatDate=(date)=>{
-        return date.split("T")[0]
+        return date?.split("T")[0]
     }
 
     return (

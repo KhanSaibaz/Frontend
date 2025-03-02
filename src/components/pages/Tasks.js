@@ -16,7 +16,7 @@ import Table from "./Table";
 import { toast, ToastContainer } from 'react-toastify';
 import { useGetTaskQuery, useAddTaskMutation } from "../redux/slices/TaskSlice";
 import { useDeleteTaskMutation } from '../redux/slices/TaskSlice';
-
+import { useUpdateTaskMutation } from "../redux/slices/TaskSlice";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     "& .MuiDialogContent-root": { padding: theme.spacing(2) },
@@ -31,11 +31,13 @@ const Task = () => {
     const [fromTime, setFromTime] = useState("");
     const [toTime, setToTime] = useState("");
     const [taskList, setTaskList] = useState([]);
+    const [taskId, settaskId] = useState(null)
 
     // Fetch tasks from API
     const { data: taskData, refetch: refetchTask } = useGetTaskQuery();
     const [addTask] = useAddTaskMutation();
     const [deleteTask] = useDeleteTaskMutation()
+    const [updateTask] = useUpdateTaskMutation()
 
 
 
@@ -46,6 +48,7 @@ const Task = () => {
             setTaskList(taskData);
         }
     }, [taskData]);
+
 
     // Handle form submission
     const handleSubmit = async () => {
@@ -71,13 +74,12 @@ const Task = () => {
 
             if (response?.data?.message === "Task added successfully") {
                 toast.success(response?.data?.message);
-                await refetchTask(); // ✅ Ensures fresh data is loaded
+                await refetchTask();
             } else {
                 toast.error(response?.error?.data?.message);
             }
 
             setOpen(false);
-            // Reset form fields
             setTaskName("");
             setFromDate("");
             setToDate("");
@@ -86,7 +88,6 @@ const Task = () => {
 
         } catch (error) {
             toast.error("Something went wrong!");
-            console.error("Error adding task:", error);
         }
     };
 
@@ -97,10 +98,32 @@ const Task = () => {
         setFromDate(row?.fromDate ? row.fromDate.split("T")[0] : "");
         setToDate(row?.toDate ? row.toDate.split("T")[0] : "");
         setToTime(row?.toTime)
-        setFromTime(row?.toTime)
+        setFromTime(row?.fromTime)
+        settaskId(row?.id)
     }
 
-    console.log(fromDate,toDate,'ddddddddd')
+    const handleUpdate = async () => {
+        const data = { taskname, fromDate, toDate, fromTime, toTime }
+        const response = await updateTask({ data, taskId })
+
+        setTaskName("");
+        setFromDate("");
+        setToDate("");
+        setFromTime("");
+        setToTime("");
+        setOpen(false)
+        settaskId(null)
+        if (response?.data?.message) {
+
+            toast.success(response?.data?.message)
+            await refetchTask()
+        }
+        else {
+            toast.error(response?.error?.data?.message)
+
+        }
+    }
+
     const handleDeleteTask = async (id) => {
         const response = await deleteTask(id)
         if (response?.data?.message) {
@@ -127,7 +150,7 @@ const Task = () => {
             </div>
 
             <BootstrapDialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle sx={{ m: 0, p: 2 }}>Add Task</DialogTitle>
+                <DialogTitle sx={{ m: 0, p: 2 }}>{taskId?'Update task':'Add task'}</DialogTitle>
                 <IconButton
                     onClick={() => setOpen(false)}
                     sx={{ position: "absolute", right: 8, top: 8, color: "grey.500" }}
@@ -176,13 +199,21 @@ const Task = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <CommonBtn
-                        title="Submit Task"
+
+                    {taskId ? (<CommonBtn
+                        title="Update Task"
                         width="100px"
                         height="40px"
-                        onClick={handleSubmit}
+                        onClick={handleUpdate}
                         sx={{ padding: "10px", backgroundColor: '#1976D2', color: '#fff' }}
-                    />
+                    />) :
+                        (<CommonBtn
+                            title="Submit Task"
+                            width="100px"
+                            height="40px"
+                            onClick={handleSubmit}
+                            sx={{ padding: "10px", backgroundColor: '#1976D2', color: '#fff' }}
+                        />)}
                 </DialogActions>
             </BootstrapDialog>
 

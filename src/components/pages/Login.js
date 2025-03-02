@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { useLoginMutation } from '../redux/slices/loginSlice'
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { setToken } from '../redux/slices/authSlice'
 
 
@@ -15,12 +15,12 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [login, { isLoading, isError, error, data }] = useLoginMutation();
   const dispatch = useDispatch();
+  const selector=useSelector((state)=>state.auth.token)
 
 
   const handleSignIn = async () => {
 
     if (!email) {
-      console.log("click1");
 
       toast.info("Please Enter Email")
     }
@@ -33,7 +33,6 @@ const Login = () => {
         password: password
       }
       const reposnse = await login(creditanils)
-      console.log(reposnse)
       if (reposnse?.data?.message == 'Login successful') {
         dispatch(setToken(reposnse?.data?.token))
         toast.success(reposnse?.data?.message)

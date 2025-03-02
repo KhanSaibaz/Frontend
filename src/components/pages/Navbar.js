@@ -13,9 +13,10 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-
+import { useLogoutMutation } from "../redux/slices/loginSlice";
+import { logout } from "../redux/slices/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 
 const pages = [
@@ -28,6 +29,9 @@ function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
+  const [logoutApp] = useLogoutMutation()
+  const dispatch = useDispatch()
+  const selector = useSelector((state) => state.auth.token);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -45,13 +49,20 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
-  const handleLogout=()=>{
-    Cookies.remove("isAuth");
-    navigate("/");
+  const handleLogout = async () => {
+
+    const response = await logoutApp()
+
+    if (response?.data?.message) {
+      dispatch(logout());
+      navigate('/')
     }
 
+  };
+
+
   return (
-    <AppBar position="static" sx={{marginBottom:'10px'}}>
+    <AppBar position="static" sx={{ marginBottom: '10px' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
